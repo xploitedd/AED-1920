@@ -34,7 +34,7 @@ public class Arrays {
 
     /**
      * Find the greatest element that has the same prefix as word
-     * in O(nlog2n) time complexity (using binary search)
+     * in O(m*log2n) time complexity (using binary search)
      * @param v array to search
      * @param l left position to start from
      * @param r right position
@@ -48,32 +48,94 @@ public class Arrays {
         if (l < 0) l = 0;
         if (r > v.length - 1) r = v.length - 1;
 
-        String ret = binarySearchPrefix(v, l, r, word);
-        return ret == null ? v[r] : ret;
-    }
-
-    private static String binarySearchPrefix(String[] v, int l, int r, String word) {
-        if (r > l) {
+        String match = null;
+        int last = r;
+        while (l <= r) {
             int mid = l + (r - l) / 2;
-            // we can check mid + 1 since mid < r
-            if (v[mid + 1].charAt(0) <= word.charAt(0))
-                return binarySearchPrefix(v, mid + 1, r, word);
+            if (l == r) {
+                if (v[r].charAt(0) == word.charAt(0))
+                    match = v[r];
+
+                break;
+            }
+
+            if (v[mid + 1].charAt(0) <= word.charAt(0) && comparateTwoStrings(v[mid + 1], word) >= comparateTwoStrings(v[mid], word))
+                l = mid + 1;
             else
-                return binarySearchPrefix(v, l, mid, word);
-        } else if (l == r && v[l].charAt(0) == word.charAt(0)) {
-            // greatest prefix found in subarray
-            return v[l];
+                r = mid;
         }
 
-        return null;
+
+
+
+        return match == null ? v[last] : match;
+    }
+
+    private static int comparateTwoStrings(String a, String b) {
+        int c = 0;
+        for (; c < a.length() && c < b.length() && a.charAt(c) == b.charAt(c); ++c);
+        return c;
     }
 
     public static int[] getTheKElementsNearestX(int[] v, int l, int r, int x, int k){
         throw new UnsupportedOperationException();
     }
 
-    public static int median(int[] v, int l, int r){
-        throw new UnsupportedOperationException();
+    /**
+     * Calculate the median in O(n*log2 n) complexity
+     * @param v the array
+     * @param l the array lowest bound
+     * @param r the array highest bound
+     * @return the median of the array
+     */
+    public static int median(int[] v, int l, int r) {
+        int mid = l + (r - l) / 2, len = r - l + 1;
+        // first we need to find the element at the mid position
+        int first = getElementAtKPosition(v, l, r, mid);
+        // if the length of the sub-array is even we to find the mid + 1 position
+        // and calculate a simple arithmetic mean of the two elements
+        if (len % 2 == 0)
+            return (first + getElementAtKPosition(v, mid + 1, r, mid + 1)) / 2;
+
+        return first;
+    }
+
+    private static int getElementAtKPosition(int[] v, int l, int r, int k) {
+        // use the quicksort partition algorithm to find the element
+        // that stays at the position k, this is possible because the element
+        // returned by the partition method will always be ordered
+        int pivot = partition(v, l, r);
+        while (pivot != k) {
+            // if the current pivot is greater than k then the k element will
+            // be on the left side, otherwise we search for the element on the
+            // right side of the array
+            if (pivot > k)
+                pivot = partition(v, l, pivot - 1);
+            else
+                pivot = partition(v, pivot + 1, r);
+        }
+
+        return v[pivot];
+    }
+
+    private static int partition(int[] v, int l, int r) {
+        // TODO: Use Hoare partition scheme instead of Lomuto's since it's more efficient and we don't care about stability
+        int i = l - 1;
+        for (int j = l; j <= r - 1; ++j) {
+            if (v[j] < v[r]) {
+                ++i;
+                swap(v, i, j);
+            }
+        }
+
+        swap(v, i + 1, r);
+        return i + 1;
+    }
+
+    private static void swap(int[] v, int idxA, int idxB) {
+        int aux = v[idxA];
+        v[idxA] = v[idxB];
+        v[idxB] = aux;
     }
 
     /**

@@ -47,7 +47,7 @@ public class GreaterCommonPrefixTest {
 
 	@Test
 	public void greaterCommonPrefix_onArrayWithEqualsElementOnTheRight(){
-		String[] array={"agem","agendas","agendas","agendas","agendas", "agendas","agendas"};		
+		String[] array={"agem","agendas","agendas","agendas","agendas", "agendas","agendas"};
 		assertEquals("agendas",greaterCommonPrefix(array,0,6,"agendas"));
 	}
 	
