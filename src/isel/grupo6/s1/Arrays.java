@@ -11,14 +11,14 @@ public class Arrays {
      */
     public static int findMinDifference(int[] elem1, int[] elem2) {
         // we consider that the start min will be -1
-        int aIdx = 0, bIdx = 0, min = Integer.MAX_VALUE;
+        int aIdx = 0, bIdx = 0, min = -1;
         // we use a do-while because we've already checked that each array has
         // at least one element (so we don't need to do a redundant check)
         while (aIdx < elem1.length && bIdx < elem2.length) {
             int a = elem1[aIdx], b = elem2[bIdx];
             int cur = Math.abs(a - b);
             // check if we found a new minimum
-            if (cur < min)
+            if (cur < min || min == -1)
                 min = cur;
 
             // if a < b then we can increment a since any other values of elem2 array
@@ -42,8 +42,11 @@ public class Arrays {
      * @return null if there're invalid parameters or the word that matched
      */
     public static String greaterCommonPrefix(String[] v, int l, int r, String word) {
-        if (v.length == 0 || l < 0 || r >= v.length)
+        if (v.length == 0 || l > r)
             return null;
+
+        if (l < 0) l = 0;
+        if (r > v.length - 1) r = v.length - 1;
 
         String ret = binarySearchPrefix(v, l, r, word);
         return ret == null ? v[r] : ret;
@@ -73,19 +76,26 @@ public class Arrays {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Return the a new array with the squares of the elements
+     * provided in the parameter array. Time complexity: O(n)
+     * @param v array of the elements to be squared
+     * @return sorted array with squared elements
+     */
     public static int[] squaresSorted(int[] v) {
         int len = v.length;
         if (len == 0)
             return null;
 
         // find a divider between the positive and negative numbers, if needed
+        int[] ret = new int[len];
         int divider = 0;
         for (int i = 0; i < len; i++) {
             int e = v[i];
             // if the first element is already greater or equal than
             // zero then the array won't need any sort
             if (e >= 0 && divider == 0)
-                v[i] = e * e;
+                ret[i] = e * e;
             else if (e >= 0)
                 break;
             else
@@ -95,10 +105,29 @@ public class Arrays {
         // because the divider is zero that means there were
         // no negative numbers in the provided array
         if (divider == 0)
-            return v;
+            return ret;
 
-        // TODO
-        return null;
+        // use merge function to combine the positive and negative sub-arrays
+        int i = 0, k = divider - 1, j = divider;
+        while (k >= 0 && j < v.length) {
+            int q1 = v[k] * v[k], q2 = v[j] * v[j];
+            if (q1 < q2) {
+                ret[i++] = q1;
+                --k;
+            } else {
+                ret[i++] = q2;
+                ++j;
+            }
+        }
+
+        // fill the remaining
+        for (; k >= 0; --k)
+            ret[i++] = v[k] * v[k];
+
+        for (; j < v.length; ++j)
+            ret[i++] = v[j] * v[j];
+
+        return ret;
     }
 
 }
