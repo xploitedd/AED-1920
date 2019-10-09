@@ -65,9 +65,6 @@ public class Arrays {
                 r = mid;
         }
 
-
-
-
         return match == null ? v[last] : match;
     }
 
