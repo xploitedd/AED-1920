@@ -2,6 +2,8 @@ package isel.grupo6.s1;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -15,7 +17,7 @@ public class ISBNOrder {
      * LINES_PER_CHUNK is the result of the maximum heap size divided by the
      * ISBN bytes
      */
-    private static final long LINES_PER_CHUNK = Runtime.getRuntime().maxMemory() / 64;
+    private static long LINES_PER_CHUNK = Runtime.getRuntime().freeMemory() / 64;
 
     public static void main(String[] args) {
         if (args.length < 2) {
@@ -23,8 +25,10 @@ public class ISBNOrder {
             return;
         }
 
+        if (LINES_PER_CHUNK > Integer.MAX_VALUE)
+            LINES_PER_CHUNK = Integer.MAX_VALUE;
+
         String output = args[0];
-        ArrayList<String> isbn = new ArrayList<>();
         for (int i = 1; i < args.length; ++i) {
             String file = args[i];
             try (Scanner sc = new Scanner(new FileInputStream(file))) {
