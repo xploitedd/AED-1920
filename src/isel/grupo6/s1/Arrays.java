@@ -4,7 +4,8 @@ public class Arrays {
 
     /**
      * Finds the minimum absolute difference between two elements of
-     * the arrays with complexity O(elem1.length + elem2.length)
+     * the arrays with complexity O(n + m)
+     * where n = elem1.length and m = elem2.length
      * @param elem1 array of elements 1
      * @param elem2 array of elements 2
      * @return -1 if any of the arrays has zero elements, otherwise the min difference
@@ -34,7 +35,9 @@ public class Arrays {
 
     /**
      * Find the greatest element that has the same prefix as word
-     * in O(m*log2n) time complexity (using binary search)
+     * in O(m*log2 n) time complexity (using binary search)
+     * where m is the time used for the comparision between two elements
+     * and n are the elements of the array
      * @param v array to search
      * @param l left position to start from
      * @param r right position
@@ -48,24 +51,31 @@ public class Arrays {
         if (l < 0) l = 0;
         if (r > v.length - 1) r = v.length - 1;
 
-        String match = null;
-        int last = r;
+        // by default the last element is a match
+        String match = v[r];
+        // use a modified binary search
         while (l <= r) {
             int mid = l + (r - l) / 2;
             if (l == r) {
+                // make sure the first chars are equal
+                // because if we don't find any match we want to return
+                // only the last element
                 if (v[r].charAt(0) == word.charAt(0))
                     match = v[r];
 
                 break;
             }
 
+            // select the sides
+            // if there's a char with the same initial letter and greater characters in common
+            // then it's going to select second side, otherwise it selects the first
             if (v[mid + 1].charAt(0) <= word.charAt(0) && comparateTwoStrings(v[mid + 1], word) >= comparateTwoStrings(v[mid], word))
                 l = mid + 1;
             else
                 r = mid;
         }
 
-        return match == null ? v[last] : match;
+        return match;
     }
 
     private static int comparateTwoStrings(String a, String b) {
@@ -74,18 +84,70 @@ public class Arrays {
         return c;
     }
 
-    public static int[] getTheKElementsNearestX(int[] v, int l, int r, int x, int k){
-        throw new UnsupportedOperationException();
+    /**
+     * Get the k elements near x in O(n*log2 k) time complexity
+     * where n = r - l + 1
+     * @param v the array containing the elements
+     * @param l left position of the array inclusive
+     * @param r right position of the array inclusive
+     * @param x the element to search for
+     * @param k how many results we want
+     * @return returns empty array if parameters are invalid otherwise the k elements nearest x
+     */
+    public static int[] getTheKElementsNearestX(int[] v, int l, int r, int x, int k) {
+        if (r < l || k == 0) return new int[0];
+        if (v.length <= k) return v;
+
+        int[] heap = new int[k];
+        // insert the first k elements in the heap
+        for (int i = l; i < l + k; ++i)
+            heap[i - l] = v[i];
+
+        // guarantee that the array is now a heap
+        maxHeapifyForKElementsNearX(heap, 0, x);
+        // for the next elements see if the difference with x is less than the
+        // root difference with x and if it is change the root to the element
+        // and call max-heapify to reorganize the heap
+        for (int i = l + k; i <= r; ++i) {
+            int dif = Math.abs(v[i] - x);
+            if (dif < Math.abs(heap[0] - x)) {
+                heap[0] = v[i];
+                maxHeapifyForKElementsNearX(heap, 0, x);
+            }
+        }
+
+        return heap;
+    }
+
+    public static void maxHeapifyForKElementsNearX(int[] heap, int elem, int x) {
+        // get left child and right child
+        int lc = 2 * elem + 1, rc = lc + 1;
+        // find if the largest between the elem, the lc and rc
+        int largest = elem;
+        if (lc < heap.length && Math.abs(heap[lc] - x) > Math.abs(heap[elem] - x))
+            largest = lc;
+        if (rc < heap.length && Math.abs(heap[rc] - x) > Math.abs(heap[largest] - x))
+            largest = rc;
+
+        // if the largest is one of the childs then swap and max-heapify again
+        if (largest != elem) {
+            swap(heap, elem, largest);
+            maxHeapifyForKElementsNearX(heap, largest, x);
+        }
     }
 
     /**
-     * Calculate the median in O(n*log2 n) complexity
+     * Calculate the median in O(n) complexity
+     * where n is the number of elements in the array
      * @param v the array
      * @param l the array lowest bound
      * @param r the array highest bound
-     * @return the median of the array
+     * @return the median of the array or -1 if the input is invalid
      */
     public static int median(int[] v, int l, int r) {
+        if (r < l || v.length == 0)
+            return -1;
+
         int mid = l + (r - l) / 2, len = r - l + 1;
         // first we need to find the element at the mid position
         int first = getElementAtKPosition(v, l, r, mid);
