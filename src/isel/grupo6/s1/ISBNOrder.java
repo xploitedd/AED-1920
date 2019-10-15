@@ -33,18 +33,18 @@ public class ISBNOrder {
     }
 
     public static void organizeISBN(String out, String... in) {
-        int totalChunks = 0;
+        long maxLinesPerBigChunk = LINES_PER_CHUNK;
         String[] largeChunkFiles = new String[in.length];
         ArrayList<String> list = new ArrayList<>();
         for (int i = 0; i < in.length; ++i) {
             String file = in[i];
             try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                 String line = reader.readLine(), nextLine;
-                int chunks = 0;
-                for (int j = 0; line != null; ++j, line = nextLine) {
+                int chunks = 0, linec = 0;
+                for (; line != null; ++linec, line = nextLine) {
                     nextLine = reader.readLine();
                     list.add(line);
-                    if (nextLine == null || (j + 1) % LINES_PER_CHUNK == 0) {
+                    if (nextLine == null || (linec + 1) % LINES_PER_CHUNK == 0) {
                         list.sort(String::compareTo);
                         BufferedWriter fw = new BufferedWriter(new FileWriter(file + "." + chunks + ".chunk"));
                         for (int k = 0; k < list.size(); ++k)
@@ -64,7 +64,8 @@ public class ISBNOrder {
                 String large = file + ".chunk";
                 mergeChunks(LINES_PER_CHUNK, large, chunkNames);
                 largeChunkFiles[i] = large;
-                totalChunks += chunks;
+                if (maxLinesPerBigChunk < linec)
+                    maxLinesPerBigChunk = linec;
             } catch (FileNotFoundException e) {
                 System.out.println("The file " + file + " was not found!");
             } catch (IOException e) {
@@ -73,7 +74,7 @@ public class ISBNOrder {
         }
 
         try {
-            mergeChunks(totalChunks * LINES_PER_CHUNK, out, largeChunkFiles);
+            mergeChunks(maxLinesPerBigChunk, out, largeChunkFiles);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -85,23 +86,23 @@ public class ISBNOrder {
         for (int i = 0; i < chunks.length; ++i)
             br[i] = new BufferedReader(new FileReader(chunks[i]));
 
-        PriorityQueue<String> pq = new PriorityQueue<>();
-        for (long i = 0; i < totalLines; ++i) {
-            for (int j = 0; j < chunks.length; ++j) {
-                String line;
-                if ((line = br[j].readLine()) != null)
-                    pq.offer(line);
-            }
-
-            for (int j = 0; j < pq.size(); ++j)
-                fw.write(pq.poll() + "\n");
+        PriorityQueue<Entry> pq = new PriorityQueue<>();
+        for (int j = 0; j < chunks.length; ++j) {
+            String line;
+            if ((line = br[j].readLine()) != null)
+                pq.offer(new Entry(line, j));
         }
 
-        // poll the remaining chunks.length of the priority queue
-        for (int j = 0; j < chunks.length - 1; ++j) {
-            String item = pq.poll();
-            if (item != null && !item.equals(""))
-                fw.write(item + "\n");
+        for (long i = 0; i < totalLines * chunks.length; ++i) {
+            Entry entry = pq.poll();
+            if (entry == null)
+                break;
+
+            String next;
+            if ((next = br[entry.fileID].readLine()) != null)
+                pq.offer(new Entry(next, entry.fileID));
+
+            fw.write(entry.isbn + "\n");
         }
 
         fw.flush();
@@ -113,6 +114,19 @@ public class ISBNOrder {
             if (!new File(chunks[i]).delete())
                 System.out.println("Could not delete temporary file " + chunks[i]);
         }
+    }
+
+    private static class Entry implements Comparable<Entry> {
+        String isbn;
+        int fileID;
+
+        Entry(String isbn, int fileID) {
+            this.isbn = isbn;
+            this.fileID = fileID;
+        }
+
+        @Override
+        public int compareTo(Entry s) { return isbn.compareTo(s.isbn); }
     }
 
 }
