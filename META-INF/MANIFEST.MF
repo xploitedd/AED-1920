@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: isel.grupo6.s1.ISBNOrder
+Main-Class: isel.grupo6.s1.isbn1.JuntarFicheiros
 
