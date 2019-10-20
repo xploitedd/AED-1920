@@ -14,9 +14,13 @@ public class ISBNPriorityQueue {
             return;
 
         entries[elements] = entry;
-        if (elements != elements / 2) {
-            for (int cur = elements; entries[cur].compareTo(entries[cur / 2]) < 0; cur /= 2)
-                ISBNUtil.swap(entries, cur, cur / 2);
+        int parent;
+        if (elements > 0) {
+            for (int cur = elements; ; cur = parent) {
+                parent = (cur - 1) / 2;
+                if (entries[cur].compareTo(entries[parent]) >= 0) break;
+                ISBNUtil.swap(entries, cur, parent);
+            }
         }
 
         ++elements;
