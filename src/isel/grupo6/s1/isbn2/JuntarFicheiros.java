@@ -6,30 +6,13 @@ import java.util.PriorityQueue;
 public class JuntarFicheiros {
 
     private static final ISBNComparator comparator = ISBNComparator.instance;
-    private static final int BASE_LINES_PER_CHUNK = 300000;
-    private static int LINES_PER_CHUNK = BASE_LINES_PER_CHUNK;
+    private static final int LINES_PER_CHUNK = 50000;
 
     public static void main(String[] args) {
         if (args.length < 2) {
             System.out.println("Arguments missing: <outputFile> <inputFiles...>");
             return;
         }
-
-//        try (PrintWriter pw = new PrintWriter("times_util.txt")) {
-//            for (double i = 1; i <= 3.5; i += 0.5) {
-//                LINES_PER_CHUNK = (int) (BASE_LINES_PER_CHUNK * i);
-//                for (int j = 0; j < 10; j++) {
-//                    long timeStart = System.currentTimeMillis();
-//                    organizeISBN(args[0], Arrays.copyOfRange(args,1, args.length));
-//                    long took = (System.currentTimeMillis() - timeStart) / 1000;
-//                    pw.write(LINES_PER_CHUNK + "\t" + took % 60 + "\n");
-//                }
-//            }
-//
-//            pw.flush();
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
 
         String[] inputs = new String[args.length - 1];
         System.arraycopy(args, 1, inputs, 0, args.length - 1);
@@ -105,31 +88,30 @@ public class JuntarFicheiros {
         for (int i = 0; i < chunks.length; ++i)
             br[i] = new BufferedReader(new FileReader(chunks[i]));
 
-        ISBNPriorityQueue pq = new ISBNPriorityQueue(chunks.length, comparator);
+        ISBNPriorityQueue pq = new ISBNPriorityQueue(chunks.length);
         // initialize the priority queue with the first element from each chunk
         for (int i = 0; i < chunks.length; ++i) {
             String line;
             if ((line = br[i].readLine()) != null)
-                pq.insert(line, i);
+                pq.insert(new Entry(line, i));
         }
 
         BufferedWriter fw = new BufferedWriter(new FileWriter(out));
         // sort the chunk files
         for (long i = 0; i < totalLines * chunks.length; ++i) {
             // pick the smaller element from the queue
-            String isbn = pq.pop();
-            if (isbn == null)
+            Entry entry = pq.pop();
+            if (entry == null)
                 break;
 
-            int fileID = pq.getFileId();
             // because we removed the smaller element from file #fileId
             // we need to offer another element from the same file
             String next;
-            if ((next = br[fileID].readLine()) != null)
-                pq.insert(next, fileID);
+            if ((next = br[entry.fileID].readLine()) != null)
+                pq.insert(new Entry(next, entry.fileID));
 
             // write the smaller element to the output
-            fw.write(isbn + "\n");
+            fw.write(entry.isbn + "\n");
         }
 
         fw.flush();

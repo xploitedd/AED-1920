@@ -2,66 +2,48 @@ package isel.grupo6.s1.isbn2;
 
 public class ISBNPriorityQueue {
 
-    private int lastFileId = -1;
-    private ISBNComparator comparator;
-    private String[] isbnArray;
-    private Integer[] fIDs;
+    private Entry[] entries;
     private int elements = 0;
 
-    public ISBNPriorityQueue(int maxSize, ISBNComparator comparator) {
-        isbnArray = new String[maxSize];
-        fIDs = new Integer[maxSize];
-        this.comparator = comparator;
+    public ISBNPriorityQueue(int maxSize) {
+        entries = new Entry[maxSize];
     }
 
-    public void insert(String isbn, int fid) {
-        if (elements == isbnArray.length)
+    public void insert(Entry entry) {
+        if (elements == entries.length)
             return;
 
-        isbnArray[elements] = isbn;
-        fIDs[elements] = fid;
-
+        entries[elements] = entry;
         if (elements != elements / 2) {
-            for (int cur = elements; comparator.compare(isbnArray[cur], isbnArray[cur / 2]) < 0; cur /= 2) {
-                ISBNUtil.swap(isbnArray, cur, cur / 2);
-                ISBNUtil.swap(fIDs, cur, cur / 2);
-            }
+            for (int cur = elements; entries[cur].compareTo(entries[cur / 2]) < 0; cur /= 2)
+                ISBNUtil.swap(entries, cur, cur / 2);
         }
 
         ++elements;
     }
 
-    public String pop() {
+    public Entry pop() {
         if (elements == 0)
             return null;
 
         // save elements that will be popped
-        String isbn = isbnArray[0];
-        lastFileId = fIDs[0];
+        Entry entry = entries[0];
         // change the first element to the last element
-        isbnArray[0] = isbnArray[--elements];
-        fIDs[0] = fIDs[elements];
+        entries[0] = entries[--elements];
         minHeapify(0);
-        return isbn;
-    }
-
-    public int getFileId() {
-        int fileId = lastFileId;
-        lastFileId = -1;
-        return fileId;
+        return entry;
     }
 
     private void minHeapify(int pos) {
         int lc = 2 * pos + 1, rc = lc + 1;
         int smallest = pos;
-        if (lc < elements && comparator.compare(isbnArray[lc], isbnArray[smallest]) < 0)
+        if (lc < elements && entries[lc].compareTo(entries[smallest]) < 0)
             smallest = lc;
-        if (rc < elements && comparator.compare(isbnArray[rc], isbnArray[smallest]) < 0)
+        if (rc < elements && entries[rc].compareTo(entries[smallest]) < 0)
             smallest = rc;
 
         if (smallest != pos) {
-            ISBNUtil.swap(isbnArray, pos, smallest);
-            ISBNUtil.swap(fIDs, pos, smallest);
+            ISBNUtil.swap(entries, pos, smallest);
             minHeapify(smallest);
         }
     }

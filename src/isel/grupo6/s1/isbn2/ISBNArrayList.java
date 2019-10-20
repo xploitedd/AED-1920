@@ -34,7 +34,7 @@ public class ISBNArrayList {
     private static void quickSort(String[] a, int l, int r, ISBNComparator comparator) {
         if (l < r) {
             int len = r - l + 1;
-            if (len <= 10) {
+            if (len <= 5) {
                 insertionSort(a, l, r, comparator);
             } else {
                 int i = partition(a, l, r, comparator);
