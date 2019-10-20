@@ -15,8 +15,10 @@ public class JuntarFicheiros {
             return;
         }
 
+        String[] inputs = new String[args.length - 1];
+        System.arraycopy(args, 1, inputs, 0, args.length - 1);
         long timeStart = System.currentTimeMillis();
-        organizeISBN(args[0], Arrays.copyOfRange(args,1, args.length));
+        organizeISBN(args[0], inputs);
         long took = (System.currentTimeMillis() - timeStart) / 1000;
         System.out.println("Took " + took / 60 + "m" + took % 60 + "s to sort!");
     }

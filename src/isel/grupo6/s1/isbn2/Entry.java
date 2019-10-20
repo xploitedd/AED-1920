@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 public class Entry implements Comparable<Entry> {
 
-    private static final Comparator<String> comparator = ISBNComparator.instance;
+    private static final ISBNComparator comparator = ISBNComparator.instance;
     public String isbn;
     public int fileID;
 

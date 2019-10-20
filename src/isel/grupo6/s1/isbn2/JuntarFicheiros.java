@@ -1,14 +1,11 @@
 package isel.grupo6.s1.isbn2;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.PriorityQueue;
 
 public class JuntarFicheiros {
 
-    private static final Comparator<String> comparator = ISBNComparator.instance;
+    private static final ISBNComparator comparator = ISBNComparator.instance;
     private static final int BASE_LINES_PER_CHUNK = 300000;
     private static int LINES_PER_CHUNK = BASE_LINES_PER_CHUNK;
 
@@ -34,8 +31,10 @@ public class JuntarFicheiros {
 //            e.printStackTrace();
 //        }
 
+        String[] inputs = new String[args.length - 1];
+        System.arraycopy(args, 1, inputs, 0, args.length - 1);
         long timeStart = System.currentTimeMillis();
-        organizeISBN(args[0], Arrays.copyOfRange(args,1, args.length));
+        organizeISBN(args[0], inputs);
         long took = (System.currentTimeMillis() - timeStart) / 1000;
         System.out.println("Took " + took / 60 + "m" + took % 60 + "s to sort!");
     }
@@ -43,7 +42,7 @@ public class JuntarFicheiros {
     public static void organizeISBN(String out, String... in) {
         long maxLinesPerBigChunk = LINES_PER_CHUNK;
         String[] largeChunkFiles = new String[in.length];
-        StringArrayList list = new StringArrayList();
+        ISBNArrayList list = new ISBNArrayList(LINES_PER_CHUNK);
         // iterate through each file
         for (int i = 0; i < in.length; ++i) {
             String file = in[i];
@@ -58,7 +57,7 @@ public class JuntarFicheiros {
                     // also, if this is the end of a chunk we need to process it too
                     if (nextLine == null || (linec + 1) % LINES_PER_CHUNK == 0) {
                         // first sort the chunk using the default sorting algorithm
-                        list.sort();
+                        list.sort(comparator);
                         // write the sorted list to the chunk file
                         BufferedWriter fw = new BufferedWriter(new FileWriter(file + "." + chunks + ".chunk"));
                         String sorted;
