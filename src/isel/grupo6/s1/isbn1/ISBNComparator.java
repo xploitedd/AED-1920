@@ -11,8 +11,8 @@ public class ISBNComparator implements Comparator<String> {
     @Override
     public int compare(String s1, String s2) {
         // we can implement the comparator we want here
-        int len1 = s1.length(), len2 = s2.length();
-        for (int i = 0, j = 0; i < len1 && j < len2; ++i, ++j) {
+        int len1 = s1.length() - 2, len2 = s2.length() - 2;
+        for (int i = 2, j = 2; i < len1 && j < len2; ++i, ++j) {
             char c1 = s1.charAt(i), c2 = s2.charAt(j);
             if (c1 == '-') {
                 if (++i == len1) break;

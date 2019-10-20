@@ -6,7 +6,7 @@ import java.util.*;
 public class JuntarFicheiros {
 
     private static final Comparator<String> comparator = ISBNComparator.instance;
-    private static final int BASE_LINES_PER_CHUNK = 300000;
+    private static final int BASE_LINES_PER_CHUNK = 100000;
     private static int LINES_PER_CHUNK = BASE_LINES_PER_CHUNK;
 
     public static void main(String[] args) {

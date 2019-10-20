@@ -105,30 +105,31 @@ public class JuntarFicheiros {
         for (int i = 0; i < chunks.length; ++i)
             br[i] = new BufferedReader(new FileReader(chunks[i]));
 
-        PriorityQueue<Entry> pq = new PriorityQueue<>();
+        ISBNPriorityQueue pq = new ISBNPriorityQueue(chunks.length, comparator);
         // initialize the priority queue with the first element from each chunk
         for (int i = 0; i < chunks.length; ++i) {
             String line;
             if ((line = br[i].readLine()) != null)
-                pq.offer(new Entry(line, i));
+                pq.insert(line, i);
         }
 
         BufferedWriter fw = new BufferedWriter(new FileWriter(out));
         // sort the chunk files
         for (long i = 0; i < totalLines * chunks.length; ++i) {
             // pick the smaller element from the queue
-            Entry entry = pq.poll();
-            if (entry == null)
+            String isbn = pq.pop();
+            if (isbn == null)
                 break;
 
+            int fileID = pq.getFileId();
             // because we removed the smaller element from file #fileId
             // we need to offer another element from the same file
             String next;
-            if ((next = br[entry.fileID].readLine()) != null)
-                pq.offer(new Entry(next, entry.fileID));
+            if ((next = br[fileID].readLine()) != null)
+                pq.insert(next, fileID);
 
             // write the smaller element to the output
-            fw.write(entry.isbn + "\n");
+            fw.write(isbn + "\n");
         }
 
         fw.flush();
