@@ -1,7 +1,6 @@
 package isel.grupo6.s1.isbn2;
 
 import java.io.*;
-import java.util.PriorityQueue;
 
 public class JuntarFicheiros {
 

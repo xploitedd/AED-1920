@@ -24,7 +24,7 @@ public class ISBNArrayList {
         return elem;
     }
 
-    public void sort(ISBNComparator comparator) { quickSort(elements, 0, writePos - 1, comparator); }
+    public void sort(ISBNComparator comparator) { quickSort(elements, readPos, writePos - 1, comparator); }
 
     public void reset() {
         readPos = 0;
@@ -33,11 +33,23 @@ public class ISBNArrayList {
 
     private static void quickSort(String[] a, int l, int r, ISBNComparator comparator) {
         if (l < r) {
-            int len = r - l + 1;
-            if (len <= 10) {
+            if (r - l + 1 <= 10) {
                 insertionSort(a, l, r, comparator);
             } else {
                 int i = partition(a, l, r, comparator);
+                if (r == i) {
+                    boolean sorted = true;
+                    for (int j = l + 1; j <= r; j++) {
+                        if (comparator.compare(a[j - 1], a[j]) > 0) {
+                            sorted = false;
+                            break;
+                        }
+                    }
+
+                    if (sorted)
+                        return;
+                }
+
                 quickSort(a, l, i - 1, comparator);
                 quickSort(a, i + 1, r, comparator);
             }
@@ -45,16 +57,14 @@ public class ISBNArrayList {
     }
 
     private static int partition(String[] a, int l, int r, ISBNComparator comparator) {
-        int i = l - 1, j = r;
+        int i = l - 1, j = r + 1;
         for ( ; ; ) {
-            while (i < r && comparator.compare(a[++i], a[r]) < 0);
-            while (j > l && comparator.compare(a[--j], a[r]) > 0);
-            if (i >= j) break;
+            do { ++i; } while (comparator.compare(a[i], a[r]) < 0);
+            do { --j; } while (comparator.compare(a[j], a[r]) > 0);
+            if (i >= j) return j;
             ISBNUtil.swap(a, i, j);
         }
-
-        ISBNUtil.swap(a, i, r);
-        return i;
+        //ISBNUtil.swap(a, i, r);
     }
 
     private static void insertionSort(String[] a, int l, int r, ISBNComparator comparator) {

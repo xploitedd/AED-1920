@@ -6,7 +6,7 @@ import java.util.*;
 public class JuntarFicheiros {
 
     private static final Comparator<String> comparator = ISBNComparator.instance;
-    private static final int LINES_PER_CHUNK = 100000;
+    private static int LINES_PER_CHUNK = 100000;
 
     public static void main(String[] args) {
         if (args.length < 2) {
@@ -16,10 +16,25 @@ public class JuntarFicheiros {
 
         String[] inputs = new String[args.length - 1];
         System.arraycopy(args, 1, inputs, 0, args.length - 1);
-        long timeStart = System.currentTimeMillis();
-        organizeISBN(args[0], inputs);
-        long took = (System.currentTimeMillis() - timeStart) / 1000;
-        System.out.println("Took " + took / 60 + "m" + took % 60 + "s to sort!");
+        try (PrintWriter pw = new PrintWriter("testResults/sorted.1.txt")) {
+            for (int i = 1; i <= 6; i++) {
+                for (int j = 0; j < 10; j++) {
+                    LINES_PER_CHUNK = 50000 * i;
+                    long init = System.currentTimeMillis();
+                    organizeISBN(args[0], inputs);
+                    double took = (System.currentTimeMillis() - init) / 1000.0;
+                    pw.write(LINES_PER_CHUNK + "\t" + took + "\n");
+                }
+            }
+
+            pw.flush();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+//        long timeStart = System.currentTimeMillis();
+//        organizeISBN(args[0], inputs);
+//        long took = (System.currentTimeMillis() - timeStart) / 1000;
+//        System.out.println("Took " + took / 60 + "m" + took % 60 + "s to sort!");
     }
 
     public static void organizeISBN(String out, String... in) {
