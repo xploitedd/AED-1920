@@ -39,7 +39,7 @@ public class ISBNArrayList {
                 int i = partition(a, l, r, comparator);
                 if (r == i) {
                     boolean sorted = true;
-                    for (int j = l + 1; j <= r; j++) {
+                    for (int j = l + 1; j < r; j++) {
                         if (comparator.compare(a[j - 1], a[j]) > 0) {
                             sorted = false;
                             break;
