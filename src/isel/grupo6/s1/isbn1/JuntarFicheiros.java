@@ -22,6 +22,11 @@ public class JuntarFicheiros {
         System.out.println("Took " + took / 60 + "m" + took % 60 + "s to sort!");
     }
 
+    /**
+     * Organize isbn's files
+     * @param out output file
+     * @param in input isbn files
+     */
     public static void organizeISBN(String out, String... in) {
         long maxLinesPerBigChunk = LINES_PER_CHUNK;
         String[] largeChunkFiles = new String[in.length];
@@ -82,6 +87,13 @@ public class JuntarFicheiros {
         }
     }
 
+    /**
+     * Merge several chunk files into one output file
+     * @param totalLines total lines per chunk
+     * @param out output file
+     * @param chunks chunk files
+     * @throws IOException if there was an error with the files
+     */
     public static void mergeChunks(long totalLines, String out, String... chunks) throws IOException {
         // create a reader for each chuck file
         BufferedReader[] br = new BufferedReader[chunks.length];
