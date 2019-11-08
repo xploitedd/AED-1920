@@ -2,7 +2,7 @@ package isel.grupo6.aulas;
 
 public class StackList<E> {
 
-    private static class Node<E> {
+    public static class Node<E> {
         E element;
         Node<E> next;
 
@@ -12,11 +12,15 @@ public class StackList<E> {
         }
     }
 
-    private Node<E> top;
+    public Node<E> top;
+    private int size = 0;
 
     public boolean isEmpty() { return top == null; }
 
-    public void push(E elem) { top = new Node<>(elem, top); }
+    public void push(E elem) {
+        top = new Node<>(elem, top);
+        size++;
+    }
 
     public E peek() {
         if (isEmpty()) return null;
@@ -27,7 +31,10 @@ public class StackList<E> {
         if (isEmpty()) return null;
         E elem = top.element;
         top = top.next;
+        --size;
         return elem;
     }
+
+    public int getSize() { return size; }
 
 }
