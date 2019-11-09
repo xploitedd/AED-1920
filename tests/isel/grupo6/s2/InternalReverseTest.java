@@ -1,12 +1,11 @@
-/*
-package series.serie2;
+package isel.grupo6.s2;
 
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 
+import static isel.grupo6.s2.ListUtils.internalReverse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static series.serie2.ListUtils.internalReverse;
 
 public class InternalReverseTest {
 
@@ -27,18 +26,18 @@ public class InternalReverseTest {
 
 	@Test
 	public void internalreverse_lists(){
-		Node<Node<Integer>> list = new Node<Node<Integer>>();
+		Node<Node<Integer>> list = new Node<>();
 		Node<Node<Integer>> current=list;
 		Node<Node<Integer>> novo=null;
-		ArrayList<ArrayList<Integer>> array=new ArrayList<ArrayList<Integer>>();
+		ArrayList<ArrayList<Integer>> array=new ArrayList<>();
 		for(int i=1;i<=10;i++){
-			ArrayList<Integer> subArray=new ArrayList<Integer>();
+			ArrayList<Integer> subArray=new ArrayList<>();
 			for(int j=1;j<=10;j++){
 				subArray.add(i*j);
 			}
 			array.add(subArray);
 			current.value=ListUtilTest.getListWithoutSentinel(subArray);
-			novo=new Node<Node<Integer>>();
+			novo=new Node<>();
 			current.next=novo;
 			novo.previous=current;
 			current=current.next;
@@ -92,4 +91,4 @@ public class InternalReverseTest {
 			list=list.next;
 		}
 	}
-}*/
+}

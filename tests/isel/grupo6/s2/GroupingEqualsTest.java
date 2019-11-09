@@ -1,9 +1,10 @@
-/*
-package series.serie2;
+package isel.grupo6.s2;
+
 import org.junit.jupiter.api.Test;
 import java.util.*;
+
+import static isel.grupo6.s2.Iterables.groupingEquals;
 import static org.junit.jupiter.api.Assertions.*;
-import static series.serie2.Iterables.groupingEquals;
 
 public class GroupingEqualsTest {
 
@@ -66,4 +67,3 @@ public class GroupingEqualsTest {
 
 
 }
-*/

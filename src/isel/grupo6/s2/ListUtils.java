@@ -58,4 +58,64 @@ public class ListUtils {
         return list3;
     }
 
+    public static <E> void internalReverse(Node<Node<E>> list) {
+        if (list == null) return;
+        for (Node<Node<E>> parent = list; parent != null; parent = parent.next) {
+            Node<E> head = parent.value;
+            for (Node<E> child = head; child != null; child = child.previous) {
+                Node<E> aux = child.next;
+                child.next = child.previous;
+                child.previous = aux;
+                if (aux != null) head = aux;
+            }
+
+            parent.value = head;
+        }
+    }
+
+    public static <E> E mostOccurrent(Node<E>[] lists, Comparator<E> cmp) {
+        if (lists == null || lists.length == 0) return null;
+        int len = lists.length;
+
+        E mostOccurred = null;
+        int maxOccurrences = 0;
+        for ( ; ; ) {
+            Node<E> currentList = lists[0];
+            for (int i = 1; i < len; i++) {
+                if (lists[i] != null) {
+                    if (currentList == null) currentList = lists[i];
+                    // find the minimum (the starting point)
+                    if (cmp.compare(lists[i].value, currentList.value) < 0)
+                        currentList = lists[i];
+                }
+            }
+
+            if (currentList == null)
+                break;
+
+            int occurrences = 0;
+            for (int i = 0; i < len; i++) {
+                if (lists[i] == null) continue;
+                Node<E> curr = lists[i];
+                for (; curr != null; curr = curr.next) {
+                    int diff = cmp.compare(curr.value, currentList.value);
+                    if (diff == 0)
+                        ++occurrences;
+                    else
+                        break;
+                }
+
+                if (curr != null) curr.previous = null;
+                lists[i] = curr;
+            }
+
+            if (occurrences > maxOccurrences) {
+                maxOccurrences = occurrences;
+                mostOccurred = currentList.value;
+            }
+        }
+
+        return mostOccurred;
+    }
+
 }

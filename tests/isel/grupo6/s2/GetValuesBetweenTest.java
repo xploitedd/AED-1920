@@ -1,9 +1,9 @@
-/*
 package isel.grupo6.s2;
 
 import org.junit.jupiter.api.Test;
 import java.util.*;
 
+import static isel.grupo6.s2.Iterables.getValuesBetween;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GetValuesBetweenTest{
@@ -109,4 +109,3 @@ public class GetValuesBetweenTest{
 		assertThrows(UnsupportedOperationException.class, it::remove);
 	}
 }
-*/

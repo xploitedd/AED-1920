@@ -33,7 +33,7 @@ public class IntersectionTest {
 		assertFalse(ListUtilTest.isEmptyListWithSentinel(list2));
 		list1 = ListUtilTest.getList(1, 1, 1, null); list2 = ListUtilTest.getList(1, 1, 1, null);
 		Node<Integer> res = intersection(list1, list2, CMP_NATURAL_ORDER);
-		assertEquals(new Integer(1), res.value);
+		assertEquals(1, res.value);
 		assertTrue(ListUtilTest.isEmptyListWithSentinel(list1));
 		assertTrue(ListUtilTest.isEmptyListWithSentinel(list2));
 	}

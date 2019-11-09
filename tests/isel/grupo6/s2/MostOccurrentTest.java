@@ -1,5 +1,4 @@
-/*
-package series.serie2;
+package isel.grupo6.s2;
 
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +7,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static series.serie2.ListUtils.mostOccurrent;
+import static isel.grupo6.s2.ListUtils.*;
 
 public class MostOccurrentTest {
 
@@ -80,5 +79,4 @@ public class MostOccurrentTest {
 	}
 
 }
-*/
 
