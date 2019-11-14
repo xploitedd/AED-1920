@@ -57,6 +57,11 @@ public class DocumentsSimilarity {
         }
     }
 
+    /**
+     * Loads words in a file to the specified map
+     * @param fileName name of the file to load
+     * @param map map to load the words to
+     */
     private static void loadFile(String fileName, HashMap<String, Integer> map) {
         try (Scanner sc = new Scanner(new FileInputStream(fileName))) {
             while (sc.hasNext()) {
@@ -70,6 +75,10 @@ public class DocumentsSimilarity {
         }
     }
 
+    /**
+     * Print all words from both files
+     * (Repeated words are only printed once)
+     */
     private static void allWords() {
         for (String k : file1.keySet()) {
             if (!file2.containsKey(k))
@@ -82,8 +91,15 @@ public class DocumentsSimilarity {
         }
     }
 
+    /**
+     * Print words that occur k times in total
+     * @param k times that a word occur
+     */
     private static void wordsWithTheSameOccurrence(int k) {
+        // there are no words if k = 0
         if (k > 0) {
+            // print each word that as k as the number of total
+            // occurrences in both files
             for (String key : file1.keySet()) {
                 int v2 = file2.getOrDefault(key, 0);
                 int total = file1.get(key) + v2;
@@ -93,8 +109,13 @@ public class DocumentsSimilarity {
         }
     }
 
+    /**
+     * Print the similarity between both files
+     */
     private static void similarity() {
         int similarity = 0;
+        // iterate each file and for each
+        // difference increment the similarity in 1
         for (String k : file1.keySet()) {
             int v1 = file1.get(k);
             Integer v2 = file2.getOrDefault(k, 0);
