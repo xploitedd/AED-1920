@@ -1,14 +1,11 @@
 package isel.grupo6.s2;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.HashMap;
 import java.util.Scanner;
 
-public class DocumentsSimilarity {
+public class DocumentSimilarity2 {
 
-    private static final HashMap<String, Integer> file1 = new HashMap<>();
-    private static final HashMap<String, Integer> file2 = new HashMap<>();
+    private static final SimilarityHashMap file1 = new SimilarityHashMap();
+    private static final SimilarityHashMap file2 = new SimilarityHashMap();
 
     public static void main(String[] args) {
         if (args.length != 2) {
@@ -16,8 +13,8 @@ public class DocumentsSimilarity {
             return;
         }
 
-        loadFile(args[0], file1);
-        loadFile(args[1], file2);
+        file1.loadFile(args[0]);
+        file2.loadFile(args[1]);
 
         Scanner sc = new Scanner(System.in);
         label:
@@ -58,24 +55,6 @@ public class DocumentsSimilarity {
     }
 
     /**
-     * Loads words in a file to the specified map
-     * @param fileName name of the file to load
-     * @param map map to load the words to
-     */
-    private static void loadFile(String fileName, HashMap<String, Integer> map) {
-        try (Scanner sc = new Scanner(new FileInputStream(fileName))) {
-            while (sc.hasNext()) {
-                String w = sc.next();
-                Integer count = map.get(w);
-                count = (count != null ? count + 1 : 1);
-                map.put(w, count);
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * Print all words from both files
      * (Repeated words are only printed once)
      */
@@ -99,9 +78,9 @@ public class DocumentsSimilarity {
             // print each word that as k as the number of total
             // occurrences in both files
             for (String key : file1.keySet()) {
-                int v2 = file2.getOrDefault(key, 0);
+                int v2 = file2.get(key);
                 int total = file1.get(key) + v2;
-                if (v2 != 0 && total == k)
+                if (v2 != SimilarityHashMap.NON_EXISTANT && total == k)
                     System.out.println(key);
             }
         }
@@ -116,7 +95,7 @@ public class DocumentsSimilarity {
         // difference increment the similarity in 1
         for (String k : file1.keySet()) {
             int v1 = file1.get(k);
-            Integer v2 = file2.getOrDefault(k, 0);
+            int v2 = file2.get(k);
             if (v1 != v2) ++similarity;
         }
 
