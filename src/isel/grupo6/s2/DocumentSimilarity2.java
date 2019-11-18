@@ -13,8 +13,11 @@ public class DocumentSimilarity2 {
             return;
         }
 
+        long loadStart = System.currentTimeMillis();
         file1.loadFile(args[0]);
         file2.loadFile(args[1]);
+        long loadFinish = System.currentTimeMillis() - loadStart;
+        System.out.println("Took: " + loadFinish / 1000.0 + " seconds to load!");
 
         Scanner sc = new Scanner(System.in);
         label:

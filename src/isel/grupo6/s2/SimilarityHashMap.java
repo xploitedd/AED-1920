@@ -9,10 +9,10 @@ public class SimilarityHashMap {
 
     public static final int NON_EXISTANT = -1;
     private static final float LOAD_FACTOR = 0.75f;
-    private static final int[] MERSENNE_EXP = { 17, 19, 31, 67, 127 };
+    private static final int[] PRIMES = { 5, 7, 13, 17, 19, 23 };
 
     private Node[] map;
-    private int actualMersenne = 0;
+    private int actualPrime = 0;
     private int n;
 
     public SimilarityHashMap() { map = new Node[11]; }
@@ -42,6 +42,7 @@ public class SimilarityHashMap {
         Node node = new Node();
         node.key = key;
         node.value = value;
+
         if (map[i] == null) {
             map[i] = node;
         } else {
@@ -49,11 +50,12 @@ public class SimilarityHashMap {
             for (; kvNode != null; kvNode = kvNode.next) {
                 if (kvNode.key.equals(key)) {
                     kvNode.value = node.value;
+                    n--;
                     break;
                 }
             }
 
-            // if the loop finished then there are no equal nodes and we need
+            // if the loop finished then there are no equal nodes then we need
             // to insert one at the head of the list
             if (kvNode == null) {
                 map[i].prev = node;
@@ -112,12 +114,16 @@ public class SimilarityHashMap {
     }
 
     private void resize() {
-        // resize and save the old map for copy
+        if (actualPrime > PRIMES.length)
+            throw new RuntimeException("File size too large");
+
         Node[] oldMap = map;
-        map = new Node[(int) Math.pow(2, MERSENNE_EXP[actualMersenne++]) - 1];
+        map = new Node[((int) Math.pow(2, PRIMES[actualPrime++])) - 1];
         // copy the elements from the old map to the new one, calculating the indexes again
         for (Node kvNode : oldMap) {
-            for (Node cur = kvNode; cur != null; cur = cur.next) {
+            Node next;
+            for (Node cur = kvNode; cur != null; cur = next) {
+                next = cur.next;
                 int newIdx = indexOf(cur.key);
                 cur.next = map[newIdx];
                 if (map[newIdx] != null) map[newIdx].prev = cur;

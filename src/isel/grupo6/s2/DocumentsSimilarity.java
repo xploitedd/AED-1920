@@ -1,7 +1,6 @@
 package isel.grupo6.s2;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -16,8 +15,11 @@ public class DocumentsSimilarity {
             return;
         }
 
+        long loadStart = System.currentTimeMillis();
         loadFile(args[0], file1);
         loadFile(args[1], file2);
+        long loadFinish = System.currentTimeMillis() - loadStart;
+        System.out.println("Took: " + loadFinish / 1000.0 + " seconds to load!");
 
         Scanner sc = new Scanner(System.in);
         label:
@@ -63,14 +65,16 @@ public class DocumentsSimilarity {
      * @param map map to load the words to
      */
     private static void loadFile(String fileName, HashMap<String, Integer> map) {
-        try (Scanner sc = new Scanner(new FileInputStream(fileName))) {
-            while (sc.hasNext()) {
-                String w = sc.next();
-                Integer count = map.get(w);
-                count = (count != null ? count + 1 : 1);
-                map.put(w, count);
-            }
-        } catch (FileNotFoundException e) {
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            br.lines().forEach(line -> {
+                String[] words = line.split(" ");
+                for (String w : words) {
+                    int count = map.getOrDefault(w, 0);
+                    count = (count != 0 ? count + 1 : 1);
+                    map.put(w, count);
+                }
+            });
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
