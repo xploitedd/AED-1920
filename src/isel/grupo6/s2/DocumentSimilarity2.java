@@ -4,8 +4,8 @@ import java.util.Scanner;
 
 public class DocumentSimilarity2 {
 
-    private static final SimilarityHashMap file1 = new SimilarityHashMap();
-    private static final SimilarityHashMap file2 = new SimilarityHashMap();
+    private static final OccurrencesHashMap file1 = new OccurrencesHashMap();
+    private static final OccurrencesHashMap file2 = new OccurrencesHashMap();
 
     public static void main(String[] args) {
         if (args.length != 2) {
@@ -20,7 +20,6 @@ public class DocumentSimilarity2 {
         System.out.println("Took: " + loadFinish / 1000.0 + " seconds to load!");
 
         Scanner sc = new Scanner(System.in);
-        label:
         for ( ; ; ) {
             System.out.print("> ");
             if (sc.hasNext()) {
@@ -29,7 +28,7 @@ public class DocumentSimilarity2 {
 
                 switch (cmd) {
                     case "exit":
-                        break label;
+                        System.exit(0);
                     case "allWords":
                     case "aw":
                         allWords();
@@ -83,7 +82,7 @@ public class DocumentSimilarity2 {
             for (String key : file1.keySet()) {
                 int v2 = file2.get(key);
                 int total = file1.get(key) + v2;
-                if (v2 != SimilarityHashMap.NON_EXISTANT && total == k)
+                if (v2 != OccurrencesHashMap.NON_EXISTENT && total == k)
                     System.out.println(key);
             }
         }

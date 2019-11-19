@@ -5,17 +5,17 @@ import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class SimilarityHashMap {
+public class OccurrencesHashMap {
 
-    public static final int NON_EXISTANT = -1;
+    public static final int NON_EXISTENT = -1;
     private static final float LOAD_FACTOR = 0.75f;
     private static final int[] PRIMES = { 5, 7, 13, 17, 19, 23 };
 
     private Node[] map;
     private int actualPrime = 0;
-    private int n;
+    private int size;
 
-    public SimilarityHashMap() { map = new Node[11]; }
+    public OccurrencesHashMap() { map = new Node[11]; }
 
     public void loadFile(String fileName) {
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
@@ -23,7 +23,7 @@ public class SimilarityHashMap {
                 String[] words = line.split(" ");
                 for (String w : words) {
                     int count = get(w);
-                    count = (count != NON_EXISTANT ? count + 1 : 1);
+                    count = (count != NON_EXISTENT ? count + 1 : 1);
                     put(w, count);
                 }
             });
@@ -34,27 +34,30 @@ public class SimilarityHashMap {
 
     public void put(String key, int value) {
         if (key == null) return;
-        ++n;
-        if ((float) n / map.length > LOAD_FACTOR)
+        ++size;
+        if ((float) size / map.length > LOAD_FACTOR)
             resize();
 
         int i = indexOf(key);
-        Node node = new Node();
-        node.key = key;
-        node.value = value;
 
         if (map[i] == null) {
+            Node node = new Node();
+            node.key = key;
+            node.value = value;
             map[i] = node;
         } else {
             Node kvNode = map[i];
             for (; kvNode != null; kvNode = kvNode.next) {
                 if (kvNode.key.equals(key)) {
-                    kvNode.value = node.value;
-                    n--;
+                    kvNode.value = value;
+                    size--;
                     break;
                 }
             }
 
+            Node node = new Node();
+            node.key = key;
+            node.value = value;
             // if the loop finished then there are no equal nodes then we need
             // to insert one at the head of the list
             if (kvNode == null) {
@@ -66,19 +69,19 @@ public class SimilarityHashMap {
     }
 
     public int get(String key) {
-        if (key == null) return NON_EXISTANT;
+        if (key == null) return NON_EXISTENT;
         Node node = map[indexOf(key)];
         for ( ; node != null; node = node.next) {
             if (node.key.equals(key))
                 return node.value;
         }
 
-        return NON_EXISTANT;
+        return NON_EXISTENT;
     }
 
-    public boolean containsKey(String key) { return get(key) != NON_EXISTANT; }
+    public boolean containsKey(String key) { return get(key) != NON_EXISTENT; }
 
-    public int size() { return n; }
+    public int size() { return size; }
 
     public Set<String> keySet() {
         return new AbstractSet<>() {
@@ -108,7 +111,7 @@ public class SimilarityHashMap {
 
             @Override
             public int size() {
-                return n;
+                return size;
             }
         };
     }
