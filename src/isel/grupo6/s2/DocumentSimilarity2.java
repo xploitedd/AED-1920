@@ -4,8 +4,7 @@ import java.util.Scanner;
 
 public class DocumentSimilarity2 {
 
-    private static final OccurrencesHashMap file1 = new OccurrencesHashMap();
-    private static final OccurrencesHashMap file2 = new OccurrencesHashMap();
+    private static final OccurrencesHashMap file = new OccurrencesHashMap();
 
     public static void main(String[] args) {
         if (args.length != 2) {
@@ -14,8 +13,8 @@ public class DocumentSimilarity2 {
         }
 
         long loadStart = System.currentTimeMillis();
-        file1.loadFile(args[0]);
-        file2.loadFile(args[1]);
+        file.loadFile(args[0], true);
+        file.loadFile(args[1], false);
         long loadFinish = System.currentTimeMillis() - loadStart;
         System.out.println("Took: " + loadFinish / 1000.0 + " seconds to load!");
 
@@ -42,7 +41,7 @@ public class DocumentSimilarity2 {
                         similarity();
                         break;
                     default:
-                        if (sc.hasNext()) sc.next();
+                        sc.nextLine();
                         System.out.println("Command not available. Available Commands:");
                         System.out.println("allWords - list all words that are at least in one file.");
                         System.out.println("wordsWithTheSameOccurrence k - list words that are in both files with k occurrences.");
@@ -61,13 +60,8 @@ public class DocumentSimilarity2 {
      * (Repeated words are only printed once)
      */
     private static void allWords() {
-        for (String k : file1.keySet())
+        for (String k : file.keySet())
             System.out.println(k);
-
-        for (String k : file2.keySet()) {
-            if (!file1.containsKey(k))
-                System.out.println(k);
-        }
     }
 
     /**
@@ -79,10 +73,11 @@ public class DocumentSimilarity2 {
         if (k > 0) {
             // print each word that as k as the number of total
             // occurrences in both files
-            for (String key : file1.keySet()) {
-                int v2 = file2.get(key);
-                int total = file1.get(key) + v2;
-                if (v2 != OccurrencesHashMap.NON_EXISTENT && total == k)
+            for (String key : file.keySet()) {
+                IntegerPair pair = file.get(key);
+                int f1c = pair.first, f2c = pair.second;
+                int total = f1c + f2c;
+                if (f1c > 0 && f2c > 0 && total == k)
                     System.out.println(key);
             }
         }
@@ -95,18 +90,15 @@ public class DocumentSimilarity2 {
         int similarity = 0;
         // iterate each file and for each
         // difference increment the similarity in 1
-        for (String k : file1.keySet()) {
-            int v1 = file1.get(k);
-            int v2 = file2.get(k);
-            if (v1 != v2) ++similarity;
-        }
-
-        for (String k : file2.keySet()) {
-            if (!file1.containsKey(k)) ++similarity;
+        for (String k : file.keySet()) {
+            IntegerPair pair = file.get(k);
+            int f1c = pair.first;
+            int f2c = pair.second;
+            if (f1c != f2c) ++similarity;
         }
 
         System.out.println("Similarity between files is " + similarity);
-        System.out.println("Maximum words: " + (file1.size() + file2.size()));
+        System.out.println("Maximum words: " + (file.size()));
     }
 
 }

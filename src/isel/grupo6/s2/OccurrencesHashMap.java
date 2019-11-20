@@ -7,7 +7,6 @@ import java.util.Set;
 
 public class OccurrencesHashMap {
 
-    public static final int NON_EXISTENT = -1;
     private static final float LOAD_FACTOR = 0.75f;
     private static final int[] PRIMES = { 5, 7, 13, 17, 19, 23 };
 
@@ -17,13 +16,21 @@ public class OccurrencesHashMap {
 
     public OccurrencesHashMap() { map = new Node[11]; }
 
-    public void loadFile(String fileName) {
+    public void loadFile(String fileName, boolean inc) {
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             br.lines().forEach(line -> {
                 String[] words = line.split(" ");
                 for (String w : words) {
-                    int count = get(w);
-                    count = (count != NON_EXISTENT ? count + 1 : 1);
+                    IntegerPair count = get(w);
+                    if (count == null) {
+                        count = new IntegerPair(inc ? 1 : 0, inc ? 0 : 1);
+                    } else {
+                        if (inc)
+                            count.first = count.first + 1;
+                        else
+                            count.second = count.second + 1;
+                    }
+
                     put(w, count);
                 }
             });
@@ -32,7 +39,7 @@ public class OccurrencesHashMap {
         }
     }
 
-    public void put(String key, int value) {
+    public void put(String key, IntegerPair value) {
         if (key == null) return;
         ++size;
         if ((float) size / map.length > LOAD_FACTOR)
@@ -68,18 +75,18 @@ public class OccurrencesHashMap {
         }
     }
 
-    public int get(String key) {
-        if (key == null) return NON_EXISTENT;
+    public IntegerPair get(String key) {
+        if (key == null) return null;
         Node node = map[indexOf(key)];
         for ( ; node != null; node = node.next) {
             if (node.key.equals(key))
                 return node.value;
         }
 
-        return NON_EXISTENT;
+        return null;
     }
 
-    public boolean containsKey(String key) { return get(key) != NON_EXISTENT; }
+    public boolean containsKey(String key) { return get(key) != null; }
 
     public int size() { return size; }
 
@@ -142,7 +149,7 @@ public class OccurrencesHashMap {
 
     private static class Node {
         String key;
-        int value;
+        IntegerPair value;
         Node next;
         Node prev;
 
@@ -153,13 +160,14 @@ public class OccurrencesHashMap {
             if (!(o instanceof Node)) return false;
             Node node = (Node) o;
             // Map.Entry equals as defined by java jdk11 specification
-            return (key == null ? node.key == null : key.equals(node.key)) && value == node.value;
+            return (key == null ? node.key == null : key.equals(node.key)) &&
+                    (value == null ? node.value == null : value.equals(node.value));
         }
 
         @Override
         public int hashCode() {
             // Map.Entry hashcode as defined by java jdk11 specification
-            return (key == null ? 0 : key.hashCode()) ^ (value * 31);
+            return (key == null ? 0 : key.hashCode()) ^ (value == null ? 0 : value.hashCode());
         }
     }
 

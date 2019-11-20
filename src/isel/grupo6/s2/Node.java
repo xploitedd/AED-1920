@@ -7,6 +7,6 @@ public class Node<E> {
 	public Node<E> previous;
 	
 	public Node() {}
-	public Node(E value) { this.value=value; }
+	public Node(E value) { this.value = value; }
 
 }
