@@ -1,15 +1,12 @@
-package isel.grupo6.s2;
+package isel.grupo6.s2.part2;
 
-import java.io.*;
-import java.util.HashMap;
+import isel.grupo6.s2.IntegerPair;
+
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class DocumentsSimilarity {
 
-    private static final Pattern PATTERN = Pattern.compile("([A-Za-zÀ-ÖØ-öø-ÿ0-9-]+)");
-    private static final HashMap<String, IntegerPair> file = new HashMap<>();
+    private static final OccurrencesHashMap file = new OccurrencesHashMap();
 
     public static void main(String[] args) {
         if (args.length != 2) {
@@ -18,8 +15,8 @@ public class DocumentsSimilarity {
         }
 
         long loadStart = System.currentTimeMillis();
-        loadFile(args[0], true);
-        loadFile(args[1], false);
+        file.loadFile(args[0], true);
+        file.loadFile(args[1], false);
         long loadFinish = System.currentTimeMillis() - loadStart;
         System.out.println("Took: " + loadFinish / 1000.0 + " seconds to load!");
 
@@ -57,35 +54,6 @@ public class DocumentsSimilarity {
                 long took = System.currentTimeMillis() - tstart;
                 System.out.println("Took: " + took / 1000.0 + " seconds");
             }
-        }
-    }
-
-    /**
-     * Loads words in a file to the specified map
-     * @param fileName name of the file to load
-     * @param inc true for the first file, false for the second
-     */
-    private static void loadFile(String fileName, boolean inc) {
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-            br.lines().forEach(line -> {
-                // match all words with regex pattern
-                Matcher matcher = PATTERN.matcher(line);
-                // iterate over each match in this line
-                while (matcher.find()) {
-                    String w = matcher.group(1);
-                    IntegerPair count = file.get(w);
-                    if (count == null) {
-                        count = new IntegerPair(inc ? 1 : 0, inc ? 0 : 1);
-                    } else {
-                        if (inc) count.first = count.first + 1;
-                        else count.second = count.second + 1;
-                    }
-
-                    file.put(w, count);
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 

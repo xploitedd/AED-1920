@@ -1,4 +1,6 @@
-package isel.grupo6.s2;
+package isel.grupo6.s2.part2;
+
+import isel.grupo6.s2.IntegerPair;
 
 import java.io.*;
 import java.util.AbstractSet;
