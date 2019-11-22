@@ -3,9 +3,12 @@ package isel.grupo6.s2;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DocumentsSimilarity {
 
+    private static final Pattern PATTERN = Pattern.compile("([A-Za-zÀ-ÖØ-öø-ÿ0-9-]+)");
     private static final HashMap<String, IntegerPair> file = new HashMap<>();
 
     public static void main(String[] args) {
@@ -65,16 +68,17 @@ public class DocumentsSimilarity {
     private static void loadFile(String fileName, boolean inc) {
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             br.lines().forEach(line -> {
-                String[] words = line.split(" ");
-                for (String w : words) {
+                // match all words with regex pattern
+                Matcher matcher = PATTERN.matcher(line);
+                // iterate over each match in this line
+                while (matcher.find()) {
+                    String w = matcher.group(1);
                     IntegerPair count = file.get(w);
                     if (count == null) {
                         count = new IntegerPair(inc ? 1 : 0, inc ? 0 : 1);
                     } else {
-                        if (inc)
-                            count.first = count.first + 1;
-                        else
-                            count.second = count.second + 1;
+                        if (inc) count.first = count.first + 1;
+                        else count.second = count.second + 1;
                     }
 
                     file.put(w, count);
@@ -100,7 +104,7 @@ public class DocumentsSimilarity {
      */
     private static void wordsWithTheSameOccurrence(int k) {
         // there are no words if k = 0
-        if (k > 0) {
+        if (k > 1) {
             // print each word that as k as the number of total
             // occurrences in both files
             for (String key : file.keySet()) {

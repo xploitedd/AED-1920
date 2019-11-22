@@ -1,5 +1,8 @@
 package isel.grupo6.s2;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class DocumentSimilarity2 {
@@ -70,7 +73,7 @@ public class DocumentSimilarity2 {
      */
     private static void wordsWithTheSameOccurrence(int k) {
         // there are no words if k = 0
-        if (k > 0) {
+        if (k > 1) {
             // print each word that as k as the number of total
             // occurrences in both files
             for (String key : file.keySet()) {
