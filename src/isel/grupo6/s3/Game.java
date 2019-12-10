@@ -2,16 +2,6 @@ package isel.grupo6.s3;
 
 public class Game {
 
-    public static void main(String[] args) {
-        Game game = new Game(11, Player.BLUE);
-        game.nextMove(0, 3);
-        game.nextMove(3, 0);
-        game.nextMove(1, 2);
-        game.nextMove(0, 4);
-        game.nextMove(1, 3);
-        System.out.println("finished");
-    }
-
     public enum Player { BLUE, RED; }
 
     private int gridSize;
@@ -28,23 +18,48 @@ public class Game {
         if (x >= gridSize || y >= gridSize)
             return false;
 
+        if (isOver()) return false;
+
         int cellID = getCellPosition(x, y);
         if (isCellOccupied(cellID)) return false;
         // add cell to the disjoint-set
-        Cell cell = new Cell(cellID, currentPlayer);
+        Cell cell = new Cell(currentPlayer);
         if (currentPlayer == Player.BLUE) {
             cell.setRank(x);
-            currentPlayer = Player.RED;
+            //currentPlayer = Player.RED;
         } else {
             cell.setRank(y);
             currentPlayer = Player.BLUE;
         }
 
         cells[cellID] = cell;
+        unionCells(cellID);
         return true;
     }
 
     public boolean isOver() {
+        // check only last player
+        Player last = currentPlayer == Player.BLUE ? Player.RED : Player.BLUE;
+        if (last == Player.BLUE) {
+            final int x = gridSize - 1;
+            for (int y = 0; y < gridSize; ++y) {
+                Cell cell = cells[x + y * gridSize];
+                if (cell != null) {
+                    Cell root = findRepresentative(cell);
+                    if (root.owner == Player.BLUE && root.rank == 0) return true;
+                }
+            }
+        } else {
+            final int y = (gridSize - 1) * gridSize;
+            for (int x = 0; x < gridSize; ++x) {
+                Cell cell = cells[x + y];
+                if (cell != null) {
+                    Cell root = findRepresentative(cell);
+                    if (root.owner == Player.RED && root.rank == 0) return true;
+                }
+            }
+        }
+
         return false;
     }
 
@@ -52,20 +67,21 @@ public class Game {
         return cells[cell] != null;
     }
 
-    private Cell getRoot(Cell cell) {
-        int pos = cell.cellParent;
-        /*
-            Neighbours at cell position:
-            cell - gridSize
-            cell - gridSize + 1
-            cell - 1
-            cell + 1
-            cell + gridSize - 1
-            cell + gridSize
-         */
-        Cell max = cell;
+    private void unionCells(int pos) {
+        Cell cell = cells[pos];
+        if (cell == null) return;
+        Cell min = cell;
         for (int i = 0; i < 6; ++i) {
             int searchPos = -1;
+            /*
+                Neighbours at cell position:
+                cell - gridSize
+                cell - gridSize + 1
+                cell - 1
+                cell + 1
+                cell + gridSize - 1
+                cell + gridSize
+             */
             switch (i) {
                 case 0: searchPos = pos - gridSize; break;
                 case 1: searchPos = pos - gridSize + 1; break;
@@ -79,38 +95,41 @@ public class Game {
                 continue;
 
             Cell other = cells[searchPos];
-            if (other != null && other.rank > max.rank)
-                max = other;
+            if (other != null && other.owner == cell.owner) {
+                Cell root = findRepresentative(other);
+                if (root.rank < min.rank)
+                    min = root;
+                else if (root.rank > min.rank)
+                    root.parent = cell;
+            }
         }
 
-        return max;
+        cell.parent = min;
+        cells[pos] = cell;
+    }
+
+    private Cell findRepresentative(Cell cell) {
+        if (!cell.equals(cell.parent))
+            return findRepresentative(cell.parent);
+
+        return cell;
     }
 
     private int getCellPosition(int x, int y) { return y * gridSize + x; }
 
     private static class Cell {
         private int rank;
-        private int cellParent;
-        private Player cellOwner;
+        private Cell parent;
+        private Player owner;
 
-        Cell (int cellParent, Player cellOwner) {
-            this.cellParent = cellParent;
-            this.cellOwner = cellOwner;
+        Cell (Player owner) {
+            this.parent = this;
+            this.owner = owner;
         }
 
-        public void setCellParent(int cellParent) { this.cellParent = cellParent; }
+        public void setCellParent(Cell parent) { this.parent = parent; }
 
         public void setRank(int rank) { this.rank = rank; }
-
-        public int getRank() { return rank; }
-
-        public int getCellParent() {
-            return cellParent;
-        }
-
-        public Player getCellOwner() {
-            return cellOwner;
-        }
     }
 
 }
