@@ -2,7 +2,7 @@ package isel.grupo6.s3;
 
 public class Game {
 
-    public enum Player { BLUE, RED; }
+    public enum Player { BLUE, RED }
 
     private int gridSize;
     private Player currentPlayer;
@@ -26,7 +26,7 @@ public class Game {
         Cell cell = new Cell(currentPlayer);
         if (currentPlayer == Player.BLUE) {
             cell.setRank(x);
-            //currentPlayer = Player.RED;
+            currentPlayer = Player.RED;
         } else {
             cell.setRank(y);
             currentPlayer = Player.BLUE;
