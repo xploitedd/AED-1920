@@ -25,10 +25,10 @@ public class Game {
         // add cell to the disjoint-set
         Cell cell = new Cell(currentPlayer);
         if (currentPlayer == Player.BLUE) {
-            cell.setRank(x);
+            cell.rank = x;
             currentPlayer = Player.RED;
         } else {
-            cell.setRank(y);
+            cell.rank = y;
             currentPlayer = Player.BLUE;
         }
 
@@ -126,10 +126,6 @@ public class Game {
             this.parent = this;
             this.owner = owner;
         }
-
-        public void setCellParent(Cell parent) { this.parent = parent; }
-
-        public void setRank(int rank) { this.rank = rank; }
     }
 
 }
