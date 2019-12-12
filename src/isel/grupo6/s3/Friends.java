@@ -3,9 +3,7 @@ package isel.grupo6.s3;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
 
 public class Friends {
 
@@ -72,31 +70,56 @@ public class Friends {
 
     private static void obtainBetweenness() {
         for (Vertex v : vertices.values()) {
-            double sum = 0.0;
-            for (Vertex s : vertices.values()) {
-                // initialize all vertices
-                for (Vertex i : vertices.values()) {
-                    i.depth = 0;
-                    i.predecessors = new ArrayList<>();
-                }
-
-                int shortestPathsV = 0;
-                int shortestPaths = 0;
-                if (!s.getId().equals(v.getId())) {
-                    for (Vertex t : vertices.values()) {
-                        if (!t.getId().equals(v.getId()) && !t.getId().equals(s.getId())) {
-                            // calculate betweenness of v between s and t
-
-                        }
-                    }
-                }
-
-                // divide by two because we counted the shortest paths twice
-                sum += (shortestPathsV / 2.0) / (shortestPaths / 2.0);
+            Stack<String> propagation = new Stack<>();
+            // initialize bfs properties on each vertex
+            for (Vertex w : vertices.values()) {
+                w.dependencyCount = 0;
+                w.distance = -1;
+                w.shortestPathsCount = 0;
+                w.predecessors = new ArrayList<>();
             }
 
-            System.out.println(v.getId() + " -> " + sum);
+            v.shortestPathsCount = 1;
+            v.distance = 0;
+
+            // BFS algorithm
+            ArrayDeque<String> deque = new ArrayDeque<>();
+            deque.offer(v.getId());
+            while (!deque.isEmpty()) {
+                Vertex s = vertices.get(deque.poll());
+                propagation.push(s.getId());
+                for (String n : s.getEdges()) {
+                    Vertex k = vertices.get(n);
+                    if (k.distance < 0) {
+                        // if the vertex has not been visited
+                        k.distance = s.distance + 1;
+                        deque.offer(n);
+                    }
+
+                    if (k.distance == s.distance + 1) {
+                        // check if this is a shortest path from k to s
+                        k.shortestPathsCount += s.shortestPathsCount;
+                        k.predecessors.add(s.getId());
+                    }
+                }
+            }
+
+            // back-propagation to get betweenness using Brandes (2001) formula
+            while (!propagation.isEmpty()) {
+                Vertex w = vertices.get(propagation.pop());
+                for (String n : w.predecessors) {
+                    Vertex s = vertices.get(n);
+                    s.dependencyCount += ((double) s.shortestPathsCount / w.shortestPathsCount) * (1.0 + w.dependencyCount);
+                }
+
+                // divide by two because we are going through twice
+                if (!w.getId().equals(v.getId()))
+                    w.betweenness += w.dependencyCount / 2;
+            }
         }
+
+        for (Vertex v : vertices.values())
+            System.out.println(v.getId() + " -> " + v.betweenness);
     }
 
 }

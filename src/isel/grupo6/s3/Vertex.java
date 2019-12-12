@@ -2,7 +2,7 @@ package isel.grupo6.s3;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 public class Vertex {
@@ -11,7 +11,10 @@ public class Vertex {
     private Set<String> edges;
 
     // bfs variables
-    int depth;
+    int distance;
+    int shortestPathsCount;
+    double dependencyCount;
+    double betweenness;
     ArrayList<String> predecessors;
 
     Vertex(String id) {
@@ -26,7 +29,7 @@ public class Vertex {
         edges.add(other.id);
     }
 
-    Iterator<String> getEdgesIterator() { return edges.iterator(); }
+    Iterable<String> getEdges() { return edges; }
 
     int getDegree() { return edges.size(); }
 
