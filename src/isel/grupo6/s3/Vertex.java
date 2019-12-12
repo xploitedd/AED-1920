@@ -2,7 +2,6 @@ package isel.grupo6.s3;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 public class Vertex {

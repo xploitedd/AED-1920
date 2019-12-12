@@ -58,6 +58,8 @@ public class Friends {
                     vertices.put(friend2ID, friend2);
                 }
             });
+
+            System.out.println("Loaded " + vertices.size() + " nodes onto the network!");
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
         }
