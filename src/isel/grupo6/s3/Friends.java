@@ -71,6 +71,10 @@ public class Friends {
     }
 
     private static void obtainBetweenness() {
+        // reset betweenness count
+        for (Vertex v : vertices.values())
+            v.betweenness = 0;
+
         for (Vertex v : vertices.values()) {
             Stack<String> propagation = new Stack<>();
             // initialize bfs properties on each vertex
