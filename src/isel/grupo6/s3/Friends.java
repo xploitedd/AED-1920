@@ -42,6 +42,7 @@ public class Friends {
 
     private static void loadFile(String filename) {
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            long tstart = System.currentTimeMillis();
             br.lines().forEach(line -> {
                 String[] relationships = line.split("(\\t|\\s)+");
                 if (relationships.length == 2) {
@@ -59,7 +60,9 @@ public class Friends {
                 }
             });
 
-            System.out.println("Loaded " + vertices.size() + " nodes onto the network!");
+            System.out.println("Loaded " + vertices.size() + " nodes!");
+            long took = System.currentTimeMillis() - tstart;
+            System.out.println("Took: " + took / 1000.0 + " seconds");
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
         }
