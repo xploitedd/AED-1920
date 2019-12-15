@@ -8,12 +8,24 @@ public class Game {
     private Player currentPlayer;
     private Cell[] cells;
 
+    /**
+     * Creates a new game table
+     * @param gridSize grid size of the game
+     * @param start starting player
+     */
     public Game(int gridSize, Player start) {
         this.gridSize = gridSize;
         this.currentPlayer = start;
         cells = new Cell[gridSize * gridSize];
     }
 
+    /**
+     * Allows for the next move to be played by the
+     * current player
+     * @param x x position in the board
+     * @param y y position in the board
+     * @return true if a valid play, false otherwise
+     */
     public boolean nextMove(int x, int y) {
         if (x >= gridSize || y >= gridSize)
             return false;
@@ -37,6 +49,10 @@ public class Game {
         return true;
     }
 
+    /**
+     * Check if the game is over
+     * @return true if over, false if not
+     */
     public boolean isOver() {
         // check only last player
         Player last = currentPlayer == Player.BLUE ? Player.RED : Player.BLUE;
@@ -63,10 +79,19 @@ public class Game {
         return false;
     }
 
+    /**
+     * Check if a specified cell is already occupied
+     * @param cell cell to check
+     * @return true if occupied
+     */
     private boolean isCellOccupied(int cell) {
         return cells[cell] != null;
     }
 
+    /**
+     * Union a cell at the specified position with any of its neighbours
+     * @param pos position of the cell to union
+     */
     private void unionCells(int pos) {
         Cell cell = cells[pos];
         if (cell == null) return;
@@ -97,6 +122,7 @@ public class Game {
             Cell other = cells[searchPos];
             if (other != null && other.owner == cell.owner) {
                 Cell root = findRepresentative(other);
+                // update the parent of the root or update the min
                 if (root.rank < min.rank)
                     min = root;
                 else if (root.rank > min.rank)
@@ -104,10 +130,16 @@ public class Game {
             }
         }
 
+        // cell parent is the best of the neighbours parents
         cell.parent = min;
         cells[pos] = cell;
     }
 
+    /**
+     * Find the cell tree root (or representative)
+     * @param cell cell to search
+     * @return root of the tree
+     */
     private Cell findRepresentative(Cell cell) {
         if (!cell.equals(cell.parent))
             return findRepresentative(cell.parent);
@@ -115,6 +147,12 @@ public class Game {
         return cell;
     }
 
+    /**
+     * Gets a cell id from x and y
+     * @param x x position
+     * @param y y position
+     * @return the cell id
+     */
     private int getCellPosition(int x, int y) { return y * gridSize + x; }
 
     private static class Cell {

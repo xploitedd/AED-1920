@@ -40,27 +40,39 @@ public class Friends {
         }
     }
 
+    /**
+     * Loads edges files
+     * @param filename filename of the file to load
+     */
     private static void loadFile(String filename) {
+        long edges = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             long tstart = System.currentTimeMillis();
-            br.lines().forEach(line -> {
+            String line;
+            while ((line = br.readLine()) != null) {
                 String[] relationships = line.split("(\\t|\\s)+");
                 if (relationships.length == 2) {
                     String friend1ID = relationships[0];
                     String friend2ID = relationships[1];
 
+                    // check if vertex exist or create a new one
                     Vertex friend1 = vertices.containsKey(friend1ID) ? vertices.get(friend1ID) : new Vertex(friend1ID);
                     Vertex friend2 = vertices.containsKey(friend2ID) ? vertices.get(friend2ID) : new Vertex(friend2ID);
 
-                    friend1.addEdge(friend2);
-                    friend2.addEdge(friend1);
+                    // add friend-relationship to each one
+                    if (friend1.addEdge(friend2)) {
+                        // it's not a repeated edge
+                        friend2.addEdge(friend1);
 
-                    vertices.put(friend1ID, friend1);
-                    vertices.put(friend2ID, friend2);
+                        vertices.put(friend1ID, friend1);
+                        vertices.put(friend2ID, friend2);
+
+                        ++edges;
+                    }
                 }
-            });
+            }
 
-            System.out.println("Loaded " + vertices.size() + " nodes!");
+            System.out.println("Loaded " + vertices.size() + " nodes and " + edges + " edges!");
             long took = System.currentTimeMillis() - tstart;
             System.out.println("Took: " + took / 1000.0 + " seconds");
         } catch (IOException | NumberFormatException e) {
@@ -118,6 +130,7 @@ public class Friends {
                 Vertex w = vertices.get(propagation.pop());
                 for (String n : w.predecessors) {
                     Vertex s = vertices.get(n);
+                    // add to the dependency count the result of the magic function
                     s.dependencyCount += ((double) s.shortestPathsCount / w.shortestPathsCount) * (1.0 + w.dependencyCount);
                 }
 

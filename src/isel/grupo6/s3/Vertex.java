@@ -23,9 +23,10 @@ public class Vertex {
 
     String getId() { return id; }
 
-    void addEdge(Vertex other) {
-        if (other.id.equals(id)) return;
+    boolean addEdge(Vertex other) {
+        if (other.id.equals(id) || edges.contains(other.id)) return false;
         edges.add(other.id);
+        return true;
     }
 
     Iterable<String> getEdges() { return edges; }

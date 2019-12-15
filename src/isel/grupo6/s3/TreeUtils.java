@@ -1,5 +1,8 @@
 package isel.grupo6.s3;
 
+import java.util.LinkedList;
+import java.util.Stack;
+
 public class TreeUtils {
 
     /**
@@ -34,16 +37,22 @@ public class TreeUtils {
      */
     public static Integer kSmallest(Node<Integer> root, int k) {
         if (root == null || k < 1) return null;
-        if (k == 1) return root.value;
-        // count elements from left sub-tree
-        int countLeft = countTree(root.left);
-        if (countLeft >= k) {
-            // transverse the left sub-tree
-            return kSmallest(root.left, k - 1);
-        }
+        Stack<Node<Integer>> stack = new Stack<>();
+        for ( ; ; ) {
+            while (root != null) {
+                // add all elements from the left leg of the current tree
+                stack.push(root);
+                root = root.left;
+            }
 
-        // transverse the right sub-tree
-        return kSmallest(root.right, k - 1);
+            // if the k-th element does not exist
+            if (stack.isEmpty()) return null;
+            // remove the last stack entry and check if it's the k-th element
+            root = stack.pop();
+            if (--k == 0) return root.value;
+            // transverse the right sub-tree of the last stack entry
+            root = root.right;
+         }
     }
 
     /**
@@ -69,7 +78,7 @@ public class TreeUtils {
      */
     public static <E> boolean isBalanced(Node<E> root) {
         if (root == null) return false;
-        if (root.left == null || root.right == null) return true;
+        if (root.left == null && root.right == null) return true;
 
         // get the height of the left and right sub-trees
         int lh = height(root.left);
